@@ -1,0 +1,7 @@
+Please, confirm your email by clicking the next link.
+
+<%= url %>
+
+- Wallaclone
+
+Follo us at @wallaclone

@@ -1,41 +1,62 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const expressDeliver = require("express-deliver");
+const logger = require("morgan");
+const isDev = process.env.NODE_ENV === "development";
+const exceptionPool = require("./lib/exceptionPool");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const db = require("./lib/db");
+const { printDeliverError, getMorganConfig } = require("./lib/utils");
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const indexRouter = require("./routes/index");
+const registerRouter = require("./routes/register");
+const loginRouter = require("./routes/login");
+const logoutRouter = require("./routes/logout");
+const adsRouter = require("./routes/apiv1/advertisements");
 
-var app = express();
+const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set("views", path.join(__dirname, "views"));
+app.engine("html", require("jade").__express);
+app.set("view engine", "html");
 
-app.use(logger('dev'));
+// I enable Access-Control-Allow-Origin: * in header
+app.use(cors());
+// support parsing of application/json type post data
+app.use(bodyParser.json());
+
+if (isDev) {
+  app.use(logger("dev", getMorganConfig()));
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+expressDeliver(app, {
+  printErrorStack: false,
+  printInternalErrorData: isDev,
+  exceptionPool,
+  onError: printDeliverError
+});
 
-// catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  if (db.connection.readyState !== 1) throw new exceptionPool.NoDatabase();
+  next();
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+/**
+ * Rutas de mi API
+ */
+app.use("/", indexRouter);
+app.use("/register", registerRouter);
+app.use("/login", loginRouter);
+app.use("/logout", logoutRouter);
+app.use("/apiv1/anuncios", adsRouter);
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+expressDeliver.errorHandler(app);
 
 module.exports = app;
