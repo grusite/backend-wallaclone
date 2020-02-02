@@ -1,0 +1,25 @@
+{
+  "frontUrl": "http://localhost:3000",
+  "mail": {
+    "sender": "noreply@nodepop.es",
+    "transport": "sandbox",
+    "transports": {
+      "live": {
+        "host": "smtp.mailgun.org",
+        "port": 587,
+        "auth": {
+          "user": "postmaster@mg.nodepop.es",
+          "pass": "..."
+        }
+      },
+      "sandbox": {
+        "host": "smtp.mailtrap.io",
+        "port": 2525,
+        "auth": {
+          "user": "dd7dbde78d7a84",
+          "pass": "d98287eb6ce0a8"
+        }
+      }
+    }
+  }
+}
