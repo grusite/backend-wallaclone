@@ -5,7 +5,7 @@ const {
   sendVerifyMail,
   sendForgotPasswordMail,
   validateEmail
-} = require('../services/mailServices');
+} = require('./mailServices');
 
 /**
  * Create or update a user document, using email as glue
