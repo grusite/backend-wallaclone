@@ -1,6 +1,5 @@
-#!/usr/bin/env node
 initDebug();
-const debug = require('debug')('backend-wallaclone:server');
+const debug = require('debug')('root:main');
 debug('init');
 
 /**

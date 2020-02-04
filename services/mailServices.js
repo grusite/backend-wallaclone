@@ -19,7 +19,7 @@ let transport;
 
 async function loadTransport() {
   transport = nodemailer.createTransport(mail.transports[mail.transport]);
-  require('debug')('backend-wallaclone:mail')('transport', mail.transport);
+  require('debug')('root:mail')('transport', mail.transport);
 }
 
 async function sendVerifyMail(email, token) {

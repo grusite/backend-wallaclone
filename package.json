@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "MONGO_URI=${MONGO_URI} node ./bin/www",
-    "dev": "cross-env NODE_ENV=development nodemon",
-    "installDB": "cross-env node ./lib/installDB.js",
+    "dev": "NODE_ENV=development DEBUG=wallaclone:* nodemon",
+    "installDB": "cross-env DEBUG=wallaclone:* node ./lib/installDB.js",
     "test": "jest",
     "test:dev": "jest --watch --verbose",
     "pretty": "prettier --write '**/*.{js,json}'",
