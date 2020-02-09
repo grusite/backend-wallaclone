@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const advertisementSchema = mongoose.Schema({
   name: String,
@@ -9,7 +9,7 @@ const advertisementSchema = mongoose.Schema({
   picture: String,
   tags: {
     type: [String],
-    enum: ["lifestyle", "motor", "mobile", "work"]
+    enum: ['lifestyle', 'motor', 'mobile', 'work']
   }
 });
 
@@ -30,4 +30,4 @@ advertisementSchema.statics.list = function({
   return query.exec();
 };
 
-module.exports = mongoose.model("Ad", advertisementSchema);
+module.exports = mongoose.model('Ad', advertisementSchema);
