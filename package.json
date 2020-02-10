@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "MONGO_URI=${MONGO_URI} node ./bin/www",
-    "dev": "NODE_ENV=development DEBUG=wallaclone:* nodemon",
+    "start": "cross-env MONGO_URI=${MONGO_URI} node ./bin/www",
+    "dev": "cross-env NODE_ENV=development DEBUG=wallaclone:* nodemon",
     "installDB": "cross-env DEBUG=wallaclone:* node ./lib/installDB.js",
     "test": "jest",
     "test:dev": "jest --watch --verbose",
