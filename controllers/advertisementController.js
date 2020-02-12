@@ -1,4 +1,5 @@
 const Ad = require('../models/Advertisement');
+const { NotFound } = require('../lib/exceptionPool')
 
 module.exports = {
   /**
@@ -8,61 +9,56 @@ module.exports = {
    *  http://localhost:3000/apiv1/anuncios?limit=2&skip=2&fields=name
    */
   async listAds(req, res, next) {
-    try {
-      const name = req.query.name;
-      const sold = req.query.sold;
-      const price = req.query.price;
-      const tag = req.query.tag;
-      const skip = parseInt(req.query.start);
-      const limit = parseInt(req.query.limit);
-      const fields = req.query.fields;
-      const sort = req.query.sort;
+    const name = req.query.name;
+    const sold = req.query.sold;
+    const price = req.query.price;
+    const tag = req.query.tag;
+    const skip = parseInt(req.query.start);
+    const limit = parseInt(req.query.limit);
+    const fields = req.query.fields;
+    const sort = req.query.sort;
 
-      const filter = {};
+    const filter = {};
 
-      if (name) {
-        filter.name = new RegExp('^' + name, 'i');
-      }
-
-      if (typeof sold !== 'undefined') {
-        filter.sold = sold;
-      }
-
-      if (price) {
-        const greater = /^[0-9]+-$/g.test(price);
-        const between = /^[0-9]+-[0-9]+$/g.test(price);
-        const less = /^-[0-9]+$/g.test(price);
-
-        const [gte, lte] = price.split('-');
-
-        if (greater) {
-          filter.price = { $gte: gte };
-        } else if (between) {
-          filter.price = { $gte: gte, $lte: lte };
-        } else if (less) {
-          filter.price = { $lte: lte };
-        } else {
-          filter.price = price;
-        }
-      }
-
-      if (tag) {
-        filter.tags = { $in: tag };
-      }
-
-      const ads = await Ad.list({
-        filter: filter,
-        skip,
-        limit,
-        fields,
-        sort
-      });
-
-      // res.json({ success: true, results: ads });
-      res.render('index', { ads: ads });
-    } catch (err) {
-      next(err);
+    if (name) {
+      filter.name = new RegExp('^' + name, 'i');
     }
+
+    if (typeof sold !== 'undefined') {
+      filter.sold = sold;
+    }
+
+    if (price) {
+      const greater = /^[0-9]+-$/g.test(price);
+      const between = /^[0-9]+-[0-9]+$/g.test(price);
+      const less = /^-[0-9]+$/g.test(price);
+
+      const [gte, lte] = price.split('-');
+
+      if (greater) {
+        filter.price = { $gte: gte };
+      } else if (between) {
+        filter.price = { $gte: gte, $lte: lte };
+      } else if (less) {
+        filter.price = { $lte: lte };
+      } else {
+        filter.price = price;
+      }
+    }
+
+    if (tag) {
+      filter.tags = { $in: tag };
+    }
+
+    const ads = await Ad.list({
+      filter: filter,
+      skip,
+      limit,
+      fields,
+      sort
+    });
+
+    return ads
   },
 
   /**
@@ -70,23 +66,9 @@ module.exports = {
    * Obtiene un agente
    */
   async listAdbyId(req, res, next) {
-    try {
-      const _id = req.params.id;
-
-      const ad = [await Ad.findById(_id).exec()];
-
-      if (!ad) {
-        res
-          .status(404)
-          .json({ success: false, message: 'Advertisement Not Found' });
-        return;
-      }
-
-      // res.json({ success: true, result: ad });
-      res.render('index', { ads: ad });
-    } catch (err) {
-      next(err);
-    }
+    const ad = await Ad.findOne({_id: req.params.id});
+    if (!ad) throw new NotFound()
+    return ad
   },
 
   /**
@@ -94,12 +76,8 @@ module.exports = {
    * Devuelve los tags únicos existentes
    */
   async listTags(req, res, next) {
-    try {
-      const uniqueTags = await Ad.find().distinct('tags');
-      res.json({ success: true, result: uniqueTags });
-    } catch (err) {
-      next(err);
-    }
+    const uniqueTags = await Ad.find().distinct('tags');
+    return uniqueTags
   },
 
   /**
@@ -107,75 +85,40 @@ module.exports = {
    * Crear un anuncio
    */
   async addAd(req, res, next) {
-    try {
-      const data = req.body;
-
-      const imgPath = `/images/${req.file.filename}`;
-
-      data.picture = imgPath;
-
-      const ad = new Ad(data);
-
-      const adSaved = await ad.save();
-
-      res.json({ success: true, result: adSaved });
-    } catch (err) {
-      next(err);
-    }
+    const data = req.body;
+    const ad = new Ad(data);
+    const adSaved = await ad.save();
+    return adSaved
   },
 
   /**
    * PUT /anuncios:id
    * Actualiza un anuncio
    */
-  async updateAd(req, res, next) {
-    try {
-      const _id = req.params.id;
-      const data = req.body;
+  async updateAd(req) {
+    const _id = req.params.id;
+    const data = req.body;
 
-      const adSaved = await Ad.findOneAndUpdate(
-        { _id: _id },
-        { $set: data },
-        {
-          new: true
-        }
-      ).exec();
-
-      if (!adSaved) {
-        res
-          .status(404)
-          .json({ success: false, message: 'Advertisement Not Found' });
-        return;
+    const adSaved = await Ad.findOneAndUpdate(
+      { _id },
+      data,
+      {
+        new: true
       }
+    );
 
-      res.json({ success: true, result: adSaved });
-    } catch (err) {
-      next(err);
-    }
+    if (!adSaved) throw new NotFound()
+    return adSaved
   },
 
   /**
    * DELETE /anuncios:id
    * Elimina un anuncio
    */
-  async deleteAd(req, res, next) {
-    try {
-      const _id = req.params.id;
-
-      const ad = await Ad.findById(_id).exec();
-
-      if (!ad) {
-        res
-          .status(404)
-          .json({ success: false, message: 'Advertisement Not Found' });
-        return;
-      }
-
-      await Ad.deleteOne(ad).exec();
-
-      res.json({ success: true });
-    } catch (err) {
-      next(err);
-    }
+  async deleteAd(req) {
+    const ad = await Ad.findOne({ _id: req.params.id});
+    if (!ad) throw new NotFound()
+    await ad.remove();
+    return { done: true, message: 'Deleted correctly' };
   }
 };
