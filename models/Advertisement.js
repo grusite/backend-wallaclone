@@ -13,7 +13,10 @@ const advertisementSchema = mongoose.Schema({
   }
 });
 
-advertisementSchema.index({ tags: 1, sold: 1, price: 1, name: 1 });
+advertisementSchema.index({ tags: 1 });
+advertisementSchema.index({ sold: 1 });
+advertisementSchema.index({ price: 1 });
+advertisementSchema.index({ name: 1 });
 
 advertisementSchema.statics.list = function({
   filter,
