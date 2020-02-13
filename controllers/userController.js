@@ -2,6 +2,7 @@ const providerService = require('../services/providerService');
 const debug = require('debug')('app:user');
 const { InvalidCredentials, Unauthorized } = require('../lib/exceptionPool');
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 const {
   createUserFromProfile,
@@ -15,8 +16,7 @@ const {
 
 module.exports = {
   async login(req, res) {
-    const provider = 'traditional';
-    const payload = req.body;
+    const { provider, ...payload } = req.body;
 
     // Get user
     const user = await getUserFromCredentials(provider, payload);
@@ -26,42 +26,37 @@ module.exports = {
       expiresIn: '2d'
     });
 
-    // Añadimos a la cabecera el "Authorization" Bearer
-    res.set('Authorization', 'Bearer ' + token);
-
-    // TODO Ver si se necesita
-    setTimeout(() => {
-      res.redirect('/apiv1/anuncios');
-    }, 2000);
-
     // Return session bearer
     return { bearer: token };
   },
 
-  async logOut(req, res) {
-    // If logged remove token in front side
-    res.locals.user = '';
-    res.redirect('/');
-    return { done: true, message: 'Logout correctly' };
-  },
+  // async logOut(req, res) {
+  //   return { done: true, message: 'Logout correctly' };
+  // },
 
   async loadUser(req, res, next) {
     const [, bearer] = (req.headers.authorization || '').split(' ');
-    if (!bearer) {
-      throw new Unauthorized('No token provided');
-    }
-    // If not valid token I will throw user out
-    jwt.verify(bearer, process.env.JWT_SECRET, (err, payload) => {
-      req.user = payload._id;
-      next();
-    });
+
+    // jwt.verify(bearer, process.env.JWT_SECRET, async (err, payload) => {
+    //   const user = await User.findById(payload._id);
+    //   if (!user) throw new Unauthorized(err);
+    //   req.user = user;
+    //   next();
+    // });
+    // console.log('reqUser', req.user);
+    // next();
+    const userJWT = jwt.verify(bearer, process.env.JWT_SECRET);
+    const user = await User.findById(userJWT._id);
+    req.user = user;
+    console.log('reqUser', req.user);
+    next();
   },
 
   async requireUser(req, res, next) {
     if (!req.user) throw new Unauthorized();
-    res.redirect('/login');
     next();
   },
+
   async requireNoUser(req, res, next) {
     if (req.user) throw new Unauthorized('User should not be logged');
     next();

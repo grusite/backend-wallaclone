@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.use('/', userController.loadUser);
+router.use('/', userController.requireUser);
 router.get('/', advertisementController.listAds);
 router.get('/tags/', advertisementController.listTags);
 router.get('/:id', advertisementController.listAdbyId);

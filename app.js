@@ -9,9 +9,8 @@ const bodyParser = require('body-parser');
 const db = require('./lib/db');
 const { printDeliverError, getMorganConfig } = require('./lib/utils');
 
-const registerRouter = require('./routes/register');
-const loginRouter = require('./routes/login');
-const logoutRouter = require('./routes/logout');
+const userController = require('./controllers/userController');
+const userRouter = require('./routes/user');
 const adsRouter = require('./routes/apiv1/advertisements');
 
 const app = express();
@@ -43,10 +42,9 @@ app.use(function(req, res, next) {
 /**
  * Rutas de mi API
  */
+app.use('/', userController.loadUser);
 app.get('/', async () => 'hi');
-app.use('/register', registerRouter);
-app.use('/login', loginRouter);
-app.use('/logout', logoutRouter);
+app.use('/user', userRouter);
 app.use('/apiv1/anuncios', adsRouter);
 
 expressDeliver.errorHandler(app);
