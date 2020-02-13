@@ -5,7 +5,7 @@ const userController = require('../controllers/userController');
 
 expressDeliver(router);
 
-router.get('/', userController.getUser);
+router.get('/', userController.requireUser, userController.getUser);
 router.post('/login', userController.login);
 router.post('/register', userController.register);
 router.post('/register/verify', userController.verify);
