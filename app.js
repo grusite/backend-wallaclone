@@ -43,7 +43,7 @@ app.use(function(req, res, next) {
  * Rutas de mi API
  */
 app.use('/', userController.loadUser);
-app.get('/', async () => 'hi');
+app.get('/', async () => 'It works');
 app.use('/user', userRouter);
 app.use('/apiv1/anuncios', adsRouter);
 

@@ -7,7 +7,6 @@ expressDeliver(router);
 
 router.get('/', userController.getUser);
 router.post('/login', userController.login);
-router.use('/register', userController.requireNoUser);
 router.post('/register', userController.register);
 router.post('/register/verify', userController.verify);
 router.post('/register/verify-resend', userController.verifyResend);

@@ -37,18 +37,11 @@ module.exports = {
   async loadUser(req, res, next) {
     const [, bearer] = (req.headers.authorization || '').split(' ');
 
-    // jwt.verify(bearer, process.env.JWT_SECRET, async (err, payload) => {
-    //   const user = await User.findById(payload._id);
-    //   if (!user) throw new Unauthorized(err);
-    //   req.user = user;
-    //   next();
-    // });
-    // console.log('reqUser', req.user);
-    // next();
-    const userJWT = jwt.verify(bearer, process.env.JWT_SECRET);
-    const user = await User.findById(userJWT._id);
-    req.user = user;
-    console.log('reqUser', req.user);
+    if (bearer) {
+      const userJWT = jwt.verify(bearer, process.env.JWT_SECRET);
+      const user = await User.findById(userJWT._id);
+      req.user = user;
+    }
     next();
   },
 
