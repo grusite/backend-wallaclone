@@ -16,7 +16,7 @@ const {
 
 module.exports = {
   async login(req, res) {
-    const { provider, ...payload } = req.body;
+    const { payload, provider } = req.body;
 
     // Get user
     const user = await getUserFromCredentials(provider, payload);
