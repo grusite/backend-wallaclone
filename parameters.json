@@ -8,7 +8,7 @@
         "host": "smtp.mailgun.org",
         "port": 587,
         "auth": {
-          "user": "postmaster@mg.nodepop.es",
+          "user": "postmaster@sandbox936b980a9e524ec9832f494e614802cf.mailgun.org",
           "pass": "..."
         }
       },

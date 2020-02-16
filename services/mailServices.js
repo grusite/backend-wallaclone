@@ -1,82 +1,89 @@
-const nodemailer = require('nodemailer');
-const { mail, frontUrl } = require('../parameters');
-const debug = require('debug')('app:mail');
-const dns = require('dns');
-const { validate } = require('email-validator');
-const { InvalidData } = require('../lib/exceptionPool');
-const _ = require('lodash');
-const fs = require('fs-extra');
-const { resolve } = require('path');
+const nodemailer = require('nodemailer')
+const mg = require('nodemailer-mailgun-transport')
+const { mail, frontUrl } = require('../parameters')
+const debug = require('debug')('app:mail')
+const dns = require('dns')
+const { validate } = require('email-validator')
+const { InvalidData } = require('../lib/exceptionPool')
+const _ = require('lodash')
+const fs = require('fs-extra')
+const { resolve } = require('path')
 
-const getTemplate = name =>
-  _.template(fs.readFileSync(resolve(__dirname, `../templates/${name}`)));
-const confirmEmailHtmlTpl = getTemplate('confirmEmail.html');
-const confirmEmailTextTpl = getTemplate('confirmEmail.txt');
-const changePasswordHtmlTpl = getTemplate('changePassword.html');
-const changePasswordTextTpl = getTemplate('changePassword.txt');
+const getTemplate = name => _.template(fs.readFileSync(resolve(__dirname, `../templates/${name}`)))
+const confirmEmailHtmlTpl = getTemplate('confirmEmail.html')
+const confirmEmailTextTpl = getTemplate('confirmEmail.txt')
+const changePasswordHtmlTpl = getTemplate('changePassword.html')
+const changePasswordTextTpl = getTemplate('changePassword.txt')
 
-let transport;
+let transport
+
+const mailgunAuth = {
+  auth: {
+    api_key: process.env.MAILGUN_API_KEY,
+    domain: process.env.MAILGUN_DOMAIN,
+  },
+}
 
 async function loadTransport() {
-  transport = nodemailer.createTransport(mail.transports[mail.transport]);
-  require('debug')('root:mail')('transport', mail.transport);
+  transport = nodemailer.createTransport(mail.transports[mail.transport])
+  require('debug')('root:mail')('transport', mail.transport)
 }
 
 async function sendVerifyMail(email, token) {
-  const url = `${frontUrl}/confirm/${token}`;
-  debug('send-verify', email);
+  const url = `${frontUrl}/confirm/${token}`
+  debug('send-verify', email)
   const message = {
     from: mail.sender,
     to: email,
     subject: 'Email confirmation - Wallaclone',
     text: confirmEmailTextTpl({ url }),
-    html: confirmEmailHtmlTpl({ url })
-  };
+    html: confirmEmailHtmlTpl({ url }),
+  }
 
-  const res = await transport.sendMail(message);
-  return res;
+  const res = await transport.sendMail(message)
+  return res
 }
 async function sendForgotPasswordMail(email, token) {
-  const url = `${frontUrl}/change-password/${token}`;
+  const url = `${frontUrl}/change-password/${token}`
 
-  debug('send-forgot', email);
+  debug('send-forgot', email)
   const message = {
     from: mail.sender,
     to: email,
     subject: 'Change password - Wallaclone',
     text: changePasswordTextTpl({ url }),
-    html: changePasswordHtmlTpl({ url })
-  };
+    html: changePasswordHtmlTpl({ url }),
+  }
 
-  const res = await transport.sendMail(message);
-  return res;
+  const res = await transport.sendMail(message)
+  return res
 }
 
 async function validateEmail(email) {
   if (!validate(email))
     throw new InvalidData({
       reason: 'invalidEmailFormat',
-      message: 'Invalid email format'
-    });
-  const [, domain] = email.split('@');
+      message: 'Invalid email format',
+    })
+  const [, domain] = email.split('@')
   return new Promise((resolve, reject) => {
     dns.resolve(domain, 'MX', (err, addresses) => {
-      if (err) return reject(new InvalidData(err.message));
+      if (err) return reject(new InvalidData(err.message))
       if (!addresses || !addresses.length)
         return reject(
           new InvalidData({
             reason: 'noMXRecords',
-            message: 'No MX records for domain'
+            message: 'No MX records for domain',
           })
-        );
-      resolve();
-    });
-  });
+        )
+      resolve()
+    })
+  })
 }
 
 module.exports = {
   sendVerifyMail,
   loadTransport,
   validateEmail,
-  sendForgotPasswordMail
-};
+  sendForgotPasswordMail,
+}
