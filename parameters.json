@@ -1,7 +1,7 @@
 {
   "frontUrl": "http://localhost:3000",
   "mail": {
-    "sender": "noreply@nodepop.es",
+    "sender": "noreply@wallaclone.es",
     "transport": "sandbox",
     "transports": {
       "live": {
