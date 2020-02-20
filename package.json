@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "cross-env MONGO_URI=${MONGO_URI} node ./bin/www",
-    "dev": "cross-env NODE_ENV=development DEBUG=wallaclone:* nodemon",
-    "installDB": "cross-env DEBUG=wallaclone:* MONGO_URI=${MONGO_URI} node ./lib/installDB.js",
+    "start": "cross-env node ./bin/www",
+    "dev": "cross-env NODE_ENV=development MONGO_URI=${MONGO_URI} DEBUG=wallaclone:* nodemon",
+    "installDB": "cross-env DEBUG=wallaclone:* node ./lib/installDB.js",
     "test": "jest",
     "test:dev": "jest --watch --verbose",
     "pretty": "prettier --write '**/*.{js,json}'",
