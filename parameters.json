@@ -1,5 +1,5 @@
 {
-  "frontUrl": "http://localhost:3000",
+  "frontUrl": "https://frontend-wallaclone.grusite.now.sh",
   "mail": {
     "sender": "noreply@wallaclone.es",
     "transport": "sandbox",
