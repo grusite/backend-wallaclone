@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer')
-const mg = require('nodemailer-mailgun-transport')
-const { mail, frontUrl } = require('../parameters')
+// const mg = require('nodemailer-mailgun-transport')
+// const { mail, frontUrl } = require('../parameters')
 const debug = require('debug')('app:mail')
 const dns = require('dns')
 const { validate } = require('email-validator')
@@ -15,18 +15,50 @@ const confirmEmailTextTpl = getTemplate('confirmEmail.txt')
 const changePasswordHtmlTpl = getTemplate('changePassword.html')
 const changePasswordTextTpl = getTemplate('changePassword.txt')
 
+const frontUrl = 'https://frontend-wallaclone.grusite.now.sh'
+const sender = 'noreply@wallaclone.es'
 let transport
 
+const mailgunAuth = {
+  host: 'smtp.mailgun.org',
+  port: 587,
+  auth: {
+    user: 'postmaster@sandbox936b980a9e524ec9832f494e614802cf.mailgun.org',
+    pass: process.env.MAILGUN_PASSWD,
+  },
+}
+
+const sendGridAuth = {
+  host: 'smtp.sendgrid.net',
+  port: 587,
+  auth: {
+    user: 'apikey',
+    pass: process.env.SENDGRID_PASSWD,
+  },
+}
+
+const mailtrapAuth = {
+  host: 'smtp.mailtrap.io',
+  port: 2525,
+  auth: {
+    user: '15c99d2a395ec1',
+    pass: process.env.MAILTRAP_PASSWD,
+  },
+}
+
 async function loadTransport() {
-  transport = nodemailer.createTransport(mail.transports[mail.transport])
-  require('debug')('root:mail')('transport', mail.transport)
+  transport =
+    process.env.NODE_ENV === 'development'
+      ? nodemailer.createTransport(mailtrapAuth)
+      : nodemailer.createTransport(sendGridAuth)
+  require('debug')('root:mail')('transport', process.env.NODE_ENV)
 }
 
 async function sendVerifyMail(email, token) {
   const url = `${frontUrl}/confirm/${token}`
   debug('send-verify', email)
   const message = {
-    from: mail.sender,
+    from: sender,
     to: email,
     subject: 'Email confirmation - Wallaclone',
     text: confirmEmailTextTpl({ url }),
@@ -41,7 +73,7 @@ async function sendForgotPasswordMail(email, token) {
 
   debug('send-forgot', email)
   const message = {
-    from: mail.sender,
+    from: sender,
     to: email,
     subject: 'Change password - Wallaclone',
     text: changePasswordTextTpl({ url }),
