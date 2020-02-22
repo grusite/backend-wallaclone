@@ -2,14 +2,14 @@
   "frontUrl": "https://frontend-wallaclone.grusite.now.sh",
   "mail": {
     "sender": "noreply@wallaclone.es",
-    "transport": "sandbox",
+    "transport": "live",
     "transports": {
       "live": {
         "host": "smtp.mailgun.org",
         "port": 587,
         "auth": {
           "user": "postmaster@sandbox936b980a9e524ec9832f494e614802cf.mailgun.org",
-          "pass": "..."
+          "pass": "14f7e2d358feb960b4b17465f459d25f-52b6835e-fdab20d5"
         }
       },
       "sandbox": {

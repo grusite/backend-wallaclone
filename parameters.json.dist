@@ -1,0 +1,27 @@
+{
+  "frontUrl": "https://frontend-wallaclone.grusite.now.sh",
+  "mail": {
+    "sender": "noreply@wallaclone.es",
+    "transport": "sandbox", // live or sandbox depending if dev or prod
+    "transports": {
+      "live": {
+        "host": "smtp.mailgun.org",
+        "port": 587,
+        "auth": {
+          "user": "...", 
+          // I get it from Mailgun: https://app.mailgun.com/app/sending/domains/sandbox936b980a9e524ec9832f494e614802cf.mailgun.org
+          "pass": "..."
+        }
+      },
+      "sandbox": {
+        "host": "smtp.mailtrap.io",
+        "port": 2525,
+        "auth": {
+          "user": "...", 
+          // I get it from Mailtrap: https://mailtrap.io/inboxes/755227/settings
+          "pass": "..."
+        }
+      }
+    }
+  }
+}
