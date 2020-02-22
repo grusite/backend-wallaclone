@@ -1,6 +1,4 @@
 const nodemailer = require('nodemailer')
-// const mg = require('nodemailer-mailgun-transport')
-// const { mail, frontUrl } = require('../parameters')
 const debug = require('debug')('app:mail')
 const dns = require('dns')
 const { validate } = require('email-validator')
@@ -15,18 +13,18 @@ const confirmEmailTextTpl = getTemplate('confirmEmail.txt')
 const changePasswordHtmlTpl = getTemplate('changePassword.html')
 const changePasswordTextTpl = getTemplate('changePassword.txt')
 
-const frontUrl = 'https://frontend-wallaclone.grusite.now.sh'
+const frontUrl = process.env.FRONT_URL
 const sender = 'noreply@wallaclone.es'
 let transport
 
-const mailgunAuth = {
-  host: 'smtp.mailgun.org',
-  port: 587,
-  auth: {
-    user: 'postmaster@sandbox936b980a9e524ec9832f494e614802cf.mailgun.org',
-    pass: process.env.MAILGUN_PASSWD,
-  },
-}
+// const mailgunAuth = {
+//   host: 'smtp.mailgun.org',
+//   port: 587,
+//   auth: {
+//     user: 'postmaster@sandbox936b980a9e524ec9832f494e614802cf.mailgun.org',
+//     pass: process.env.MAILGUN_PASSWD,
+//   },
+// }
 
 const sendGridAuth = {
   host: 'smtp.sendgrid.net',
