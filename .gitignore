@@ -4,5 +4,6 @@ npm-debug.log
 .env
 .env.override
 coverage
+parameters.json
 
 .now
