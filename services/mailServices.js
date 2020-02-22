@@ -17,13 +17,6 @@ const changePasswordTextTpl = getTemplate('changePassword.txt')
 
 let transport
 
-const mailgunAuth = {
-  auth: {
-    api_key: process.env.MAILGUN_API_KEY,
-    domain: process.env.MAILGUN_DOMAIN,
-  },
-}
-
 async function loadTransport() {
   transport = nodemailer.createTransport(mail.transports[mail.transport])
   require('debug')('root:mail')('transport', mail.transport)
